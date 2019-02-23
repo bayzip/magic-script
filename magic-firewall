@@ -1,0 +1,92 @@
+#!/bin/bash
+
+if [ $1 == tambah ]; then
+    if [ $2 == port ]; then
+        firewall-cmd --permanent --zone=public --add-port=$3/$4
+        if [ $? -eq 0 ]; then
+            echo -e "Added successfully port $3/$4"
+            firewall-cmd --reload
+            if [ $? -eq 0 ]; then
+                    echo -e "Firewall was successfully reloaded"
+            else
+                    echo "Failed to reload the firewall"
+            fi
+        else
+                echo "Failed to add port"
+        fi
+    elif [ $2 == service ]; then
+        firewall-cmd --permanent --zone=public --add-service=$3
+            if [ $? -eq 0 ]; then
+                    echo -e "Added successfully service $3"
+                    firewall-cmd --reload
+                    if [ $? -eq 0 ]; then
+                            echo -e "Firewall was successfully reloaded"
+                    else
+                            echo "Failed to reload the firewall"
+                    fi
+            else
+                    echo "Failed to add service"
+            fi
+    else
+        echo "Command not found"
+    fi
+
+elif [ $1 == hapus ]; then
+    if [ $2 == port ]; then
+        firewall-cmd --permanent --zone=public --remove-port=$3/$4
+        if [ $? -eq 0 ]; then
+            echo -e "Successfully deleted port $3/$4"
+            firewall-cmd --reload
+            if [ $? -eq 0 ]; then
+                    echo -e "Firewall was successfully reloaded"
+            else
+                    echo "Failed to reload the firewall"
+            fi
+        else
+                echo "Failed to delete port"
+        fi
+    elif [ $2 == service ]; then
+        firewall-cmd --permanent --zone=public --remove-service=$3
+            if [ $? -eq 0 ]; then
+                    echo -e "Successfully deleted service $3"
+                    firewall-cmd --reload
+                    if [ $? -eq 0 ]; then
+                            echo -e "Firewall was successfully reloaded"
+                    else
+                            echo "Failed to reload the firewall"
+                    fi
+            else
+                    echo "Failed to delete service"
+            fi
+    else
+        echo "Command not found"
+    fi
+
+elif [ $1 == periksa ]; then
+    #Param
+    check_Port=$(firewall-cmd --list-port)
+    check_Service=$(firewall-cmd --list-services)
+
+    #Function
+    if [ $2 == all ]; then
+            echo -e "\nPort: $check_Port"
+            echo -e "Services: $check_Service"
+    elif [ $2 == service ]; then
+        if [[ $(firewall-cmd --list-$2 | grep -oh $3) ]]; then
+                    echo "Service is permitted!"
+            else
+                    echo "Service is not permitted!"
+            fi
+    elif [ $2 == port ]; then
+            if [[ $(firewall-cmd --list-$2 | grep -oh $3/$4) ]]; then
+                    echo "Port is permitted!"
+            else
+                    echo "Port is not permitted!"
+            fi
+    else
+        echo "Command not found"
+    fi
+
+else
+    echo "Command Tidak Ditemukan"
+fi

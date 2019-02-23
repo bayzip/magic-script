@@ -1,0 +1,37 @@
+#!/bin/bash
+
+#Color
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+#Log Status
+if [ ! -d /opt/statuslog/ ] || [ ! -d /opt/statuslog/monitor ]; then
+	mkdir -p /opt/statuslog/
+	mkdir /opt/statuslog/monitor
+fi
+service $1 status &> /opt/statuslog/$1.log	
+
+#Param
+par_Active=$(cat /opt/statuslog/$1.log | grep Active | awk '{ print $2 }' | cut -f 2,1 -d '(' --output-delimiter='' | cut -f 2,1 -d ')' --output-delimiter='')
+par_Running=$(grep -c "running" /opt/statuslog/$1.log)
+par_Noservice=$(cat /opt/statuslog/$1.log | grep Unit | awk '{ print $4 $5 $6 }' | cut -f 1 -d '.' --output-delimiter='')
+
+#Function
+if [ $1 == all ]; then
+	sh /opt/statuslog/monitor/service.data
+elif [ $1 == add ]; then
+	echo "monitor $2" >> /opt/statuslog/monitor/service.data
+elif [ $1 == dell ]; then
+	sed -i "/$2/d" /opt/statuslog/monitor/service.data
+else
+        if [[ $par_Active == active ]] || [[ $par_Running -gt 0 ]] ; then
+                echo -e "${GREEN}Yeaa, $1 service is running :) ${NC}"
+                echo -e "Uptime: $(cat /opt/statuslog/$1.log | grep Active | awk '{ print $9, $10 }')\n"
+                rm -rf  /opt/statuslog/$1.log
+        elif [[ $par_Noservice == notbefound ]]; then
+                echo -e "${RED}Yah., $1 service was not found! :'( ${NC}\n"
+        else
+                echo -e "${RED}Yah., $1 service doesn't work! :'( ${NC}\n"
+        fi
+fi
