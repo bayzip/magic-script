@@ -19,9 +19,10 @@ par_Noservice=$(cat /opt/statuslog/$1.log | grep Unit | awk '{ print $4 $5 $6 }'
 
 #Function
 if [ $1 == all ]; then
+        touch /opt/statuslog/monitor/service.data
 	sh /opt/statuslog/monitor/service.data
 elif [ $1 == add ]; then
-	echo "monitor $2" >> /opt/statuslog/monitor/service.data
+	echo "magic-monitor $2" >> /opt/statuslog/monitor/service.data
 elif [ $1 == dell ]; then
 	sed -i "/$2/d" /opt/statuslog/monitor/service.data
 else
