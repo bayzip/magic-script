@@ -42,7 +42,7 @@ if [ $1 == tambah ]; then
     fi
 
 elif [ $1 == backup ]; then
-    # Periksa Pass DB root in /root/.my.cnf ada
+    # Check config in /root/.my.cnf
     if [ -f /root/.my.cnf ]; then
 	echo "Database config found"
 	    mysql -e "show databases;"
@@ -50,7 +50,7 @@ elif [ $1 == backup ]; then
         namafiledb=$2-$(date +%y%m%d).sql
         mysqldump -e $2 > /opt/backup/database/$namafiledb
     else
-    # Jika /root/.my.cnf tidak ada
+    # If /root/.my.cnf nothing
         echo "Database config not found"
         echo "Input your database root password: "
         read -s rootpasswd
@@ -59,6 +59,69 @@ elif [ $1 == backup ]; then
             namafiledb=$2-$(date +%y%m%d).sql
             mysqldump -u root -p $2 > /opt/backup/database/$namafiledb
     fi
+
+else
+    echo "Keyword not found"
+fi
+
+elif [ $1 == restore ]; then
+    echo "Restoring database $2 with file $3"
+    # Check config in /root/.my.cnf
+    if [ -f /root/.my.cnf ]; then
+	echo "Database config found"
+	mysql -e "create database $2;"
+        if [ $? -eq 0 ]; then
+            echo "Database successfully created"
+            mysql -u root $2 < $3
+            if [ $? -eq 0 ]; then
+                echo "Database was restored"
+            else
+                echo "Database was not successfully created"
+            fi
+        else
+            echo "Database already exists"
+            echo "Are you sure want to restoration database $2? [y/n]: "
+            read -e dbokay
+            if [ "$dbokay" == y ] || [ "$dbokay" == Y ]; then
+                mysql -u root $2 < $3
+                if [ $? -eq 0 ]; then
+                    echo "Database was restored"
+                else
+                    echo "Database was not successfully created"
+                fi
+            else
+                exit
+            fi
+        fi
+    else
+    # If /root/.my.cnf nothing
+        echo "Database config not found"
+        echo "Input your database root password: "
+        read -s rootpasswd
+        mysql -u root -p${rootpasswd} -e "create database $2;"
+        if [ $? -eq 0 ]; then
+            echo "Database successfully created"
+            mysql -u root -p${rootpasswd} $2 < $3
+            if [ $? -eq 0 ]; then
+                echo "Database was restored"
+            else
+                echo "Database was not successfully created"
+            fi
+        else
+            echo "Database already exists"
+            echo "Are you sure want to restoration database $2? [y/n]: "
+            read -e dbokay
+            if [ "$dbokay" == y ] || [ "$dbokay" == Y ]; then
+                mysql -u root -p${rootpasswd} $2 < $3
+                if [ $? -eq 0 ]; then
+                    echo "Database was restored"
+                else
+                    echo "Database was not successfully created"
+                fi
+            else
+                exit
+            fi
+        fi
 
 else
     echo "Keyword not found"
