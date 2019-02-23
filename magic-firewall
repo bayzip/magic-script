@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $1 == tambah ]; then
+if [ $1 == add ]; then
     if [ $2 == port ]; then
         firewall-cmd --permanent --zone=public --add-port=$3/$4
         if [ $? -eq 0 ]; then
@@ -31,7 +31,7 @@ if [ $1 == tambah ]; then
         echo "Command not found"
     fi
 
-elif [ $1 == hapus ]; then
+elif [ $1 == dell ]; then
     if [ $2 == port ]; then
         firewall-cmd --permanent --zone=public --remove-port=$3/$4
         if [ $? -eq 0 ]; then
@@ -62,7 +62,7 @@ elif [ $1 == hapus ]; then
         echo "Command not found"
     fi
 
-elif [ $1 == periksa ]; then
+elif [ $1 == check ]; then
     #Param
     check_Port=$(firewall-cmd --list-port)
     check_Service=$(firewall-cmd --list-services)

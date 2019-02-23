@@ -9,7 +9,7 @@ if [ ! -d /opt/backup ]; then
     fi
 fi
 
-if [ $1 == tambah ]; then
+if [ $1 == add ]; then
     #Variable Database
     echo "Create new database $2"
     echo "Create user database $3"
