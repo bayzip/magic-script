@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if [ $1 == folder ]; then
+	echo -e "Finding top big folder ...."
+	du -hs $2* 2>/dev/null  | sort -rh | head -$3
+elif [ $1 == file ]; then
+	echo "Finding top big files ...."
+        find $2 -type f -exec du -sh {} + 2>/dev/null | sort -rh | head -n $3
+        echo -e "\n"
+else
+	echo "Command Not Found"
+fi
